@@ -5,6 +5,13 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PenguinGame", "PenguinGame\PenguinGame.vcxproj", "{3A8A5B63-BB4D-4300-BD6E-0232EA4CA0B3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AE52CFE8-1D1D-4A2D-8487-A98836D0E49C}"
+	ProjectSection(SolutionItems) = preProject
+		PenguinGame\src\Game.cpp = PenguinGame\src\Game.cpp
+		PenguinGame\src\main.cpp = PenguinGame\src\main.cpp
+		PenguinGame\src\State.cpp = PenguinGame\src\State.cpp
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
