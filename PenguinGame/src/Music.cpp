@@ -1,13 +1,8 @@
-#include "Music.h"
+#include "../include/Music.h"
 
 
 
 #include <iostream>
-
-#define INCLUDE_SDL_MIXER
-#include "SDL_include.h"
-
-#include "Music.h"
 
 Music::Music() {
     // init null song

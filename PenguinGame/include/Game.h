@@ -5,15 +5,15 @@
 
 
 #include <string>
-#include "SDL.h"
-#include "SDL_image.h"
-#include "SDL_mixer.h"
-#include "SDL_ttf.h"
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
 #include "State.h"
 
-
+#define ASSETS_PATH "assets/"
 using namespace std;
 const string GAME_TITLE = "Felipe N. Rocha - 17/0050084";
 const int GAME_WIDTH = 1024;
