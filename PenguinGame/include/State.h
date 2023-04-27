@@ -7,6 +7,9 @@
 
 #include "Sprite.h"
 #include "Music.h"
+#include "Face.h"
+
+#include "Sound.h"
 
 class State {
 public:
@@ -14,6 +17,8 @@ public:
     ~State();
     bool QuitRequested();
     void LoadAssets();
+    void Input();
+    void AddObject(int mouseX, int mouseY);
     void Update(float dt);
     void Render();
 

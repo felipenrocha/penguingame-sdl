@@ -29,6 +29,7 @@
     <ClInclude Include="include\Music.h" />
     <ClInclude Include="include\Rect.h" />
     <ClInclude Include="include\SDL_include.h" />
+    <ClInclude Include="include\Sound.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\State.h" />
     <ClInclude Include="include\Vec2.h" />
@@ -41,6 +42,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Music.cpp" />
     <ClCompile Include="src\Rect.cpp" />
+    <ClCompile Include="src\Sound.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\State.cpp" />
     <ClCompile Include="src\Vec2.cpp" />

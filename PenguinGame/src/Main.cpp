@@ -4,7 +4,6 @@
 
 
 int main(int argc, char** argv) {
-    Game &game = Game::GetInstance();
-    game.Run();
+    Game::GetInstance().Run();
     return 0;
 }

@@ -23,6 +23,7 @@ Music::~Music() {
 }
 
 void Music::Play(int times) {
+    
 
     /*
     
@@ -33,13 +34,13 @@ void Music::Play(int times) {
    
     
     */
-    if (music != nullptr)
-        Mix_PlayMusic(music, times);
-    else {
-        // Não se esqueça que SDL_Music pode ser nullptr.
+    // Não se esqueça que SDL_Music pode ser nullptr.
+    if (music == nullptr) {
         cout << "Nenhu8ma musica carregada: " << SDL_GetError() << endl;
         exit(1);
     }
+ 
+    Mix_PlayMusic(music, times);
 }
 
 void Music::Stop(int msToStop) {

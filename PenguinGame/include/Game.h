@@ -19,22 +19,25 @@ const string GAME_TITLE = "Felipe N. Rocha - 17/0050084";
 const int GAME_WIDTH = 1024;
 const int GAME_HEIGHT = 600;
 
-class Game
-{
+
+class Game {
+
 public:
-	Game(string title, int width, int height);
-	~Game();
-	void Run();
-	SDL_Renderer* GetRenderer() { return this->renderer; }
-	State& GetState();  
-	static Game& GetInstance();
+    Game(string title, int width, int height);
+    Game(Game&&) = default;
+    ~Game();
+
+    void Run();
+    SDL_Renderer* GetRenderer();
+    State& GetState();
+    static Game& GetInstance();
+
 private:
-	static Game* instance;
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	State *state;
+    static Game* instance;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    State* state;
 
 };
-
 
 #endif
