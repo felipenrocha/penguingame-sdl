@@ -28,6 +28,8 @@ public:
 
     void Update(float dt) override;
     void Render() override;
+    void Render(float x, float y);
+
     bool Is(string type) override;
 
 private:

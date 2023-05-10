@@ -24,13 +24,14 @@ public:
     void Render();
     bool IsDead();
     void RequestDelete();
-    void AddComponent(Component* cpt);
-    void RemoveComponent(Component* cpt);
-    Component* GetComponent(string type);
+    void AddComponent(shared_ptr<Component> cpt);
+    void RemoveComponent(shared_ptr<Component> cpt);
+    shared_ptr<Component> GetComponent(std::string type);
+
     Rect box;
 
 private:
-    vector<Component*> components;
+    vector<std::shared_ptr<Component>> components;
     bool isDead;
 
 };

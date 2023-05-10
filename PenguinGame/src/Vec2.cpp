@@ -17,6 +17,10 @@ float Vec2::magnitude() {
     return (float) sqrt(x * x + y * y);
 }
 Vec2 Vec2::GetRotated(float ang) {
-    return Vec2((x * cos(ang)) - (y * sin(ang)), (y * cos(ang)) + (x * sin(ang)));
+    int x_, y_;
+    x_ = (int) (x * cos(ang)) - (y * sin(ang));
+    y_ = (int) (y * cos(ang)) + (x * sin(ang));
+    return Vec2(x_, y_);
 }
+
 

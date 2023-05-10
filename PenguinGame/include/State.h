@@ -1,15 +1,17 @@
-//
-// Created by edgar on 16/03/18.
-//
 
-#ifndef STATE_H
-#define STATE_H
+#ifndef __STATE_H__
+#define __STATE_H__
+
+
 
 #include "Sprite.h"
 #include "Music.h"
 #include "Face.h"
-
+#include "TileMap.h"
+#include "TileSet.h"
 #include "Sound.h"
+#define MAP_TILEMAP_PATH "assets/map/tileMap.txt"
+#define MAP_TILESET_PATH "assets/img/tileset.png"
 
 class State {
 public:
@@ -23,10 +25,8 @@ public:
     void Render();
 
 private:
-    Sprite *bg;
-    Music *music;
     bool quitRequested;
-    vector<unique_ptr<GameObject>> objectArray;
+    vector<shared_ptr<GameObject>> objectArray;
 
 
 };
