@@ -1,101 +1,119 @@
-
-#include "../include/Sprite.h"
-//#include "Music.h"
 #include "../include/State.h"
+#include "../include/GameObject.h"
+#include "../include/Face.h"
+#include "../include/Vec2.h"
+#include "../include/InputManager.h"
+#include "../include/Camera.h"
+
+#define BACKGROUND_SPRITE_PATH "assets/img/ocean.jpg"
+#define BACKGROUND_MUSIC_PATH "assets/audio/stageState.ogg"
+#define BACKGROUND_MUSIC_LOOP_TIMES -1 // -1 for infinite loop
+
+#define ENEMY_SPRITE_PATH "assets/img/penguinface.png"
+#define ENEMY_SOUND_PATH "assets/audio/boom.wav"
+#define PI 3.141592
+
 #define TILE_WIDTH 64
 #define TILE_HEIGHT 64
-#define BACKGROUND_SPRITE_PATH "assets/img/ocean.jpg"
 
 
-State::State() {
-	
+State::State() : music(BACKGROUND_MUSIC_PATH),
+quitRequested(false)
+{
+    music.Play(BACKGROUND_MUSIC_LOOP_TIMES);
+    LoadAssets();
 
-	GameObject* background = new GameObject();
-	// Criando o sprite do background
-	shared_ptr<GameObject> go = std::shared_ptr<GameObject>(new GameObject());
-	go->box.x = 0;
-	go->box.y = 0;
-	Sprite* sp = new Sprite(*go, "assets/img/ocean.jpg");
-	go->AddComponent((shared_ptr<Sprite>)sp);
-	objectArray.emplace_back(std::move(go));
+    // GameObject BACKGROUND
+    // ====================================================
+    GameObject* background = new GameObject();
+    // Criando o sprite do background
+    Sprite* bg_sprite = new Sprite(*background, BACKGROUND_SPRITE_PATH);
+    background->AddComponent((std::shared_ptr<Sprite>)bg_sprite);
+    // Criando o camera follower do background
+    CameraFollower* bg_cmrFollower = new CameraFollower(*background);
+    background->AddComponent((std::shared_ptr<CameraFollower>)bg_cmrFollower);
 
-	// Adicionando o background no objectArray
-	objectArray.emplace_back(background);
+    background->box.x = 0;
+    background->box.y = 0;
 
+    // Adicionando o background no objectArray
+    objectArray.emplace_back(background);
 
-	GameObject* map = new GameObject();
-	// Criando o tileSet para o tileMap
-	TileSet* tileSet = new TileSet(*map, TILE_HEIGHT, TILE_WIDTH, MAP_TILESET_PATH);
-	// Criando o tileMap
-	TileMap* tileMap = new TileMap(*map, MAP_TILEMAP_PATH, tileSet);
-	map->AddComponent((std::shared_ptr<TileMap>)tileMap);
-    //initial x,y
-	map->box.x = 0;
-	map->box.y = 0;
+    // GameObject MAP
+    // ====================================================
+    GameObject* map = new GameObject();
+    // Criando o tileSet para o tileMap
+    TileSet* tileSet = new TileSet(*map, TILE_HEIGHT, TILE_WIDTH, MAP_TILESET_PATH);
+    // Criando o tileMap
+    TileMap* tileMap = new TileMap(*map, MAP_TILEMAP_PATH, tileSet);
+    map->AddComponent((std::shared_ptr<TileMap>)tileMap);
 
-	// Adicionando o mapa no objectArray
-	objectArray.emplace_back(map);
+    map->box.x = 0;
+    map->box.y = 0;
 
-
-
-
-	// adicionando BGM
-    Music* music = new Music();
-    music->Open("assets/audio/stageState.ogg");
-    music->Play();
-
-
-
-
-    quitRequested = false;
-	
-
-
+    // Adicionando o mapa no objectArray
+    objectArray.emplace_back(map);
 }
 
-bool State::QuitRequested() {
-    return quitRequested;
+State::~State()
+{
+    objectArray.clear();
 }
 
-void State::LoadAssets() {
-   // music = new Music("assets/audio/stageState.ogg");
-
+void State::LoadAssets()
+{
 }
 
-void State::Update(float dt) {
+void State::Update(float dt)
+{
+    // É importante que o Update da camera ocorra ANTES da atualização dos objetos
+    // para que o background tenha sua movimentação compensada adequadamente.
+    Camera::Update(dt);
 
-	Input();
-	for (int i = 0; i < objectArray.size(); i++) {
-		objectArray[i]->Update(dt);
-	}
+    // Lida com eventos de quit a partir da interface de InputManager
+    if ((InputManager::GetInstance().KeyPress(ESCAPE_KEY)) || (InputManager::GetInstance().QuitRequested()))
+    {
+        quitRequested = true;
+    }
+    if (InputManager::GetInstance().KeyPress(SPACEBAR_KEY))
+    {
+        Vec2 objPos = Vec2(200, 0).GetRotated(-PI + PI * (rand() % 1001) / 500.0) + Vec2(InputManager::GetInstance().GetMouseX(),
+            InputManager::GetInstance().GetMouseY());
+        AddObject((int)objPos.x - Camera::pos.x, (int)objPos.y - Camera::pos.y);
+    }
 
-	for (int i = 0; i < objectArray.size(); i++) {
-		if (objectArray[i]->IsDead()) {
-			objectArray.erase(objectArray.begin() + i);
-		}
-	}
+    for (int i = (int)objectArray.size() - 1; i >= 0; --i)
+    {
+        objectArray[i]->Update(dt);
+    }
+    for (int i = (int)objectArray.size() - 1; i >= 0; --i)
+    {
+        if (objectArray[i]->IsDead())
+        {
+            objectArray.erase(objectArray.begin() + i);
+        }
+    }
 
 
+    SDL_Delay(dt);
 }
 
-void State::Render() {
-    for (auto it = objectArray.begin(); it != objectArray.end(); ++it) {
-        (*it)->Render();
+void State::Render()
+{
+    for (int i = 0; i != (int)objectArray.size(); i++)
+    {
+        // std::cout << "State::Render: Indice do objeto no array " << i << std::endl;
+        objectArray[i]->Render();
     }
 }
 
-State::~State() {
-//    Esvazia o array de objetos(clear).
-    objectArray.clear();
-
+bool State::QuitRequested()
+{
+    return quitRequested;
 }
-    /*O corpo dessa função está disponível no Moodle. Podem ser
-necessários alguns ajustes nele para se adequar aos nomes de variáveis ou
-funções do seu código. Além disso, você pode tirar a chamada à
-SDL_QuitRequested em Update(), já que Input cuida de eventos de
-SDL_QUIT para nós.
-*/
-void State::Input() {
+
+void State::Input()
+{
     SDL_Event event;
     int mouseX, mouseY;
 
@@ -123,13 +141,13 @@ void State::Input() {
                 // Esse código, assim como a classe Face, é provisório. Futuramente, para
                 // chamar funções de GameObjects, use objectArray[i]->função() direto.
 
-  
                 if (go->box.Contains(float(mouseX), float(mouseY)))
                 {
                     Face* face = (Face*)go->GetComponent("Face").get();
                     if (nullptr != face)
                     {
-                        int damage = rand() % 10 + 10;
+                        int damage = std::rand() % 10 + 10;
+                        std::cout << "Damage applied: " << damage << std::endl;
                         // Aplica dano
                         face->Damage(damage);
                         // Sai do loop (só queremos acertar um)
@@ -145,30 +163,32 @@ void State::Input() {
             {
                 quitRequested = true;
             }
-			else {
-				Vec2 objPos = (Vec2(200, 0).GetRotated((float)(-M_PI + M_PI * (rand() % 1001) / 500.0))).soma_vec(Vec2(mouseX, mouseY));
-				AddObject((int)objPos.x, (int)objPos.y);
-			}
-		}
-	}
+            // Se não, crie um objeto
+            else
+            {
+                Vec2 objPos = Vec2(200, 0).GetRotated(-PI + PI * (rand() % 1001) / 500.0) + Vec2(mouseX, mouseY);
+                AddObject((int)objPos.x, (int)objPos.y);
+            }
+        }
+    }
 }
 
+void State::AddObject(int mouseX, int mouseY)
+{
+    GameObject* enemy = new GameObject();
+    // Criando o sprite do inimigo
+    Sprite* enemy_sprite = new Sprite(*enemy, ENEMY_SPRITE_PATH);
+    enemy->AddComponent((std::shared_ptr<Sprite>)enemy_sprite);
+    // Criando o som do inimigo
+    Sound* enemy_sound = new Sound(*enemy, ENEMY_SOUND_PATH);
+    enemy->AddComponent((std::shared_ptr<Sound>)enemy_sound);
+    // Criando a interface do inimigo
+    Face* enemy_interface = new Face(*enemy);
+    enemy->AddComponent((std::shared_ptr<Face>)enemy_interface);
 
-void State::AddObject(int mouseX, int mouseY) {
-	// add new sprite object
-	GameObject* go = new GameObject();
-	Sprite* sprite = new Sprite(*go, "assets/img/penguinface.png");
+    enemy->box.x = mouseX - (enemy_sprite->GetWidth()) / 2;
+    enemy->box.y = mouseY - (enemy_sprite->GetHeight()) / 2;
 
-	go->box.x = mouseX - go->box.w / 2;
-	go->box.y = mouseY - go->box.h / 2;
-	go->AddComponent((shared_ptr<Sprite>)sprite);
-
-	//add new sound object
-    Sound* sound = new Sound(*go, "assets/audio/boom.wav");
-	go->AddComponent((shared_ptr<Sound>)sound);
-    Face* face = new Face(*go);
-	go->AddComponent((shared_ptr<Face>)face);
-
-    objectArray.emplace_back(go);
-
+    // Adicionando o inimigo no objectArray
+    objectArray.emplace_back(enemy);
 }

@@ -1,4 +1,7 @@
 #include "../include/Game.h"
+#include "../include/Resources.h"
+#include "../include/InputManager.h"
+
 
 using namespace std;
 
@@ -87,11 +90,16 @@ Game::~Game() {
 
 void Game::Run() {
     while (!GetState().QuitRequested()) {
-        GetState().Update(0);
+        CalculateDeltaTime();
+        InputManager::GetInstance().Update();
+        GetState().Update(dt);
         GetState().Render();
         SDL_RenderPresent(renderer);
         SDL_Delay(33);
     }
+    Resources::ClearImages();
+    Resources::ClearMusics();
+    Resources::ClearSounds();
 }
 
 SDL_Renderer* Game::GetRenderer() {
@@ -100,6 +108,20 @@ SDL_Renderer* Game::GetRenderer() {
 
 State& Game::GetState() {
     return *state;
+}
+
+
+void Game::CalculateDeltaTime()
+{
+    //chatgpt
+    int instTime = SDL_GetTicks();
+    dt = (instTime - frameStart) / 1000.0;
+    frameStart = instTime;
+}
+
+float Game::GetDeltaTime()
+{
+    return dt;
 }
 
 Game& Game::GetInstance() {

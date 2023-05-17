@@ -9,6 +9,10 @@
 #define DOWN_ARROW_KEY SDLK_DOWN
 #define ESCAPE_KEY SDLK_ESCAPE
 #define LEFT_MOUSE_BUTTON SDL_BUTTON_LEFT
+#define SPACEBAR_KEY 32
+
+using namespace std;
+
 class InputManager {
 public:
     void Update();
@@ -29,8 +33,8 @@ private:
 
     bool mouseState[6];
     int mouseUpdate[6];
-    std::unordered_map<int, bool> keyState;
-    std::unordered_map<int, int> keyUpdate;
+    unordered_map<int, bool> keyState;
+    unordered_map<int, int> keyUpdate;
     bool quitRequested;
     int updateCounter;
     int mouseX;
