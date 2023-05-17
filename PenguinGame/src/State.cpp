@@ -81,6 +81,36 @@ void State::Update(float dt)
             InputManager::GetInstance().GetMouseY());
         AddObject((int)objPos.x - Camera::pos.x, (int)objPos.y - Camera::pos.y);
     }
+    if (InputManager::GetInstance().MousePress(1)) {
+        
+        // Percorrer de trás pra frente pra sempre clicar no objeto mais de cima
+        for (int i = int(objectArray.size()) - 1; i >= 0; --i)
+        {
+            //  cout << "In";
+
+              // Obtem o ponteiro e casta pra Face.
+            GameObject* go = (GameObject*)objectArray[i].get();
+            // Nota: Desencapsular o ponteiro é algo que devemos evitar ao máximo.
+            // Esse código, assim como a classe Face, é provisório. Futuramente, para
+            // chamar funções de GameObjects, use objectArray[i]->função() direto.
+            float mouseX = (float) InputManager::GetInstance().GetMouseX();
+            float mouseY = (float)  InputManager::GetInstance().GetMouseY();;
+            if (go->box.Contains(mouseX, mouseY))
+            {
+                cout << "In";
+                Face* face = (Face*)go->GetComponent("Face").get();
+                if (nullptr != face)
+                {
+                    int damage = std::rand() % 10 + 10;
+                    std::cout << "Damage applied: " << damage << std::endl;
+                    // Aplica dano
+                    face->Damage(damage);
+                    // Sai do loop (só queremos acertar um)
+                    break;
+                }
+            }
+        }
+    }
 
     for (int i = (int)objectArray.size() - 1; i >= 0; --i)
     {
@@ -132,9 +162,14 @@ void State::Input()
         // Se o evento for clique...
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
+            cout << "In";
+
+
             // Percorrer de trás pra frente pra sempre clicar no objeto mais de cima
             for (int i = int(objectArray.size()) - 1; i >= 0; --i)
             {
+              //  cout << "In";
+
                 // Obtem o ponteiro e casta pra Face.
                 GameObject* go = (GameObject*)objectArray[i].get();
                 // Nota: Desencapsular o ponteiro é algo que devemos evitar ao máximo.
@@ -143,6 +178,7 @@ void State::Input()
 
                 if (go->box.Contains(float(mouseX), float(mouseY)))
                 {
+                    cout << "In";
                     Face* face = (Face*)go->GetComponent("Face").get();
                     if (nullptr != face)
                     {
