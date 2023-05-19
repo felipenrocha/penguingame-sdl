@@ -38,18 +38,16 @@ void GameObject::RequestDelete()
     isDead = true;
 }
 
-void GameObject::AddComponent(std::shared_ptr<Component> cpt)
-{
+
+void GameObject::AddComponent(Component* cpt) {
     components.emplace_back(cpt);
 }
 
-void GameObject::RemoveComponent(std::shared_ptr<Component> cpt)
-{
-    for (int i = components.size() - 1; i >= 0; i--)
-    {
-        if (components[i] == cpt)
-        {
+void GameObject::RemoveComponent(Component* cpt) {
+    for (unsigned int i = 0; i < components.size(); i++) {
+        if (components[i].get() == cpt) {
             components.erase(components.begin() + i);
+            break;
         }
     }
 }

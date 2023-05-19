@@ -1,9 +1,11 @@
 #include "../include/TileMap.h"
-TileMap::TileMap(GameObject &associated, string file, TileSet *tileSet) : Component(associated)
+#include "../include/Camera.h"
+
+TileMap::TileMap(GameObject& associated, string file, TileSet* tileSet) : Component(associated)
 {
-    // Chama Load com a string passada e seta o tileset.
-    Load(file);
+    this->parallax = 0;
     SetTileSet(tileSet);
+    Load(file);
 }
 
 void TileMap::SetTileSet(TileSet *tileSet)
@@ -45,9 +47,10 @@ void TileMap::Render()
 {
     // Renderiza as camadas do mapa. Dica: utilize o RenderLayer e o box do
     //  GameObject que o cont�m.
-    for (int z = 0; z < mapDepth; ++z)
+    for (int i = 0;i < mapDepth; i++)
     {
-        RenderLayer(z, (int)associated.box.x, (int)associated.box.y);
+        RenderLayer(i, Camera::pos.x + (int)Camera::pos.x * parallax * i, Camera::pos.y + (int)Camera::pos.y * parallax * i);
+
     }
 }
 
@@ -96,4 +99,7 @@ int& TileMap::At(int x, int y, int z)
     int& reference = tileMatrix[index];
 
     return reference;
+}
+void TileMap::SetParallax(float parallax) {
+    this->parallax = parallax;
 }

@@ -24,8 +24,8 @@ public:
     void Render();
     bool IsDead();
     void RequestDelete();
-    void AddComponent(shared_ptr<Component> cpt);
-    void RemoveComponent(shared_ptr<Component> cpt);
+    void AddComponent(Component* cpt);
+    void RemoveComponent(Component* cpt);
     shared_ptr<Component> GetComponent(std::string type);
 
     Rect box;

@@ -17,42 +17,31 @@
 #define TILE_HEIGHT 64
 
 
-State::State() : music(BACKGROUND_MUSIC_PATH),
-quitRequested(false)
-{
-    music.Play(BACKGROUND_MUSIC_LOOP_TIMES);
-    LoadAssets();
+State::State() {
+quitRequested = false;
 
-    // GameObject BACKGROUND
-    // ====================================================
-    GameObject* background = new GameObject();
-    // Criando o sprite do background
-    Sprite* bg_sprite = new Sprite(*background, BACKGROUND_SPRITE_PATH);
-    background->AddComponent((std::shared_ptr<Sprite>)bg_sprite);
-    // Criando o camera follower do background
-    CameraFollower* bg_cmrFollower = new CameraFollower(*background);
-    background->AddComponent((std::shared_ptr<CameraFollower>)bg_cmrFollower);
+// Background
+std::shared_ptr<GameObject> go = std::shared_ptr<GameObject>(new GameObject());
+go->box.x = 0;
+go->box.y = 0;
+Sprite* sp = new Sprite(*go, BACKGROUND_SPRITE_PATH);
+CameraFollower* cmfl = new CameraFollower(*go);
+go->AddComponent(sp);
+go->AddComponent(cmfl);
+objectArray.emplace_back(std::move(go));
 
-    background->box.x = 0;
-    background->box.y = 0;
+// TileMap
+std::shared_ptr<GameObject> gomp = std::shared_ptr<GameObject>(new GameObject());
+gomp->box.x = 0;
+gomp->box.y = 0;
+TileSet* tlst = new TileSet(*gomp, 64, 64, "assets/img/tileset.png");
+TileMap* tlmp = new TileMap(*gomp, "assets/map/tileMap.txt", tlst);
+gomp->AddComponent(tlmp);
+objectArray.emplace_back(std::move(gomp));
 
-    // Adicionando o background no objectArray
-    objectArray.emplace_back(background);
-
-    // GameObject MAP
-    // ====================================================
-    GameObject* map = new GameObject();
-    // Criando o tileSet para o tileMap
-    TileSet* tileSet = new TileSet(*map, TILE_HEIGHT, TILE_WIDTH, MAP_TILESET_PATH);
-    // Criando o tileMap
-    TileMap* tileMap = new TileMap(*map, MAP_TILEMAP_PATH, tileSet);
-    map->AddComponent((std::shared_ptr<TileMap>)tileMap);
-
-    map->box.x = 0;
-    map->box.y = 0;
-
-    // Adicionando o mapa no objectArray
-    objectArray.emplace_back(map);
+// BGM
+music.Open(BACKGROUND_MUSIC_PATH);
+music.Play(-1);
 }
 
 State::~State()
@@ -81,36 +70,6 @@ void State::Update(float dt)
             InputManager::GetInstance().GetMouseY());
         AddObject((int)objPos.x - Camera::pos.x, (int)objPos.y - Camera::pos.y);
     }
-    if (InputManager::GetInstance().MousePress(1)) {
-        
-        // Percorrer de trás pra frente pra sempre clicar no objeto mais de cima
-        for (int i = int(objectArray.size()) - 1; i >= 0; --i)
-        {
-            //  cout << "In";
-
-              // Obtem o ponteiro e casta pra Face.
-            GameObject* go = (GameObject*)objectArray[i].get();
-            // Nota: Desencapsular o ponteiro é algo que devemos evitar ao máximo.
-            // Esse código, assim como a classe Face, é provisório. Futuramente, para
-            // chamar funções de GameObjects, use objectArray[i]->função() direto.
-            float mouseX = (float) InputManager::GetInstance().GetMouseX();
-            float mouseY = (float)  InputManager::GetInstance().GetMouseY();;
-            if (go->box.Contains(mouseX, mouseY))
-            {
-                cout << "In";
-                Face* face = (Face*)go->GetComponent("Face").get();
-                if (nullptr != face)
-                {
-                    int damage = std::rand() % 10 + 10;
-                    std::cout << "Damage applied: " << damage << std::endl;
-                    // Aplica dano
-                    face->Damage(damage);
-                    // Sai do loop (só queremos acertar um)
-                    break;
-                }
-            }
-        }
-    }
 
     for (int i = (int)objectArray.size() - 1; i >= 0; --i)
     {
@@ -124,7 +83,7 @@ void State::Update(float dt)
         }
     }
 
-
+    // delay frame
     SDL_Delay(dt);
 }
 
@@ -132,7 +91,6 @@ void State::Render()
 {
     for (int i = 0; i != (int)objectArray.size(); i++)
     {
-        // std::cout << "State::Render: Indice do objeto no array " << i << std::endl;
         objectArray[i]->Render();
     }
 }
@@ -142,89 +100,20 @@ bool State::QuitRequested()
     return quitRequested;
 }
 
-void State::Input()
-{
-    SDL_Event event;
-    int mouseX, mouseY;
-
-    // Obtenha as coordenadas do mouse
-    SDL_GetMouseState(&mouseX, &mouseY);
-
-    // SDL_PollEvent retorna 1 se encontrar eventos, zero caso contrário
-    while (SDL_PollEvent(&event))
-    {
-        // Se o evento for quit, setar a flag para terminação
-        if (event.type == SDL_QUIT)
-        {
-            quitRequested = true;
-        }
-
-        // Se o evento for clique...
-        if (event.type == SDL_MOUSEBUTTONDOWN)
-        {
-            cout << "In";
-
-
-            // Percorrer de trás pra frente pra sempre clicar no objeto mais de cima
-            for (int i = int(objectArray.size()) - 1; i >= 0; --i)
-            {
-              //  cout << "In";
-
-                // Obtem o ponteiro e casta pra Face.
-                GameObject* go = (GameObject*)objectArray[i].get();
-                // Nota: Desencapsular o ponteiro é algo que devemos evitar ao máximo.
-                // Esse código, assim como a classe Face, é provisório. Futuramente, para
-                // chamar funções de GameObjects, use objectArray[i]->função() direto.
-
-                if (go->box.Contains(float(mouseX), float(mouseY)))
-                {
-                    cout << "In";
-                    Face* face = (Face*)go->GetComponent("Face").get();
-                    if (nullptr != face)
-                    {
-                        int damage = std::rand() % 10 + 10;
-                        std::cout << "Damage applied: " << damage << std::endl;
-                        // Aplica dano
-                        face->Damage(damage);
-                        // Sai do loop (só queremos acertar um)
-                        break;
-                    }
-                }
-            }
-        }
-        if (event.type == SDL_KEYDOWN)
-        {
-            // Se a tecla for ESC, setar a flag de quit
-            if (event.key.keysym.sym == SDLK_ESCAPE)
-            {
-                quitRequested = true;
-            }
-            // Se não, crie um objeto
-            else
-            {
-                Vec2 objPos = Vec2(200, 0).GetRotated(-PI + PI * (rand() % 1001) / 500.0) + Vec2(mouseX, mouseY);
-                AddObject((int)objPos.x, (int)objPos.y);
-            }
-        }
-    }
-}
-
 void State::AddObject(int mouseX, int mouseY)
 {
-    GameObject* enemy = new GameObject();
-    // Criando o sprite do inimigo
-    Sprite* enemy_sprite = new Sprite(*enemy, ENEMY_SPRITE_PATH);
-    enemy->AddComponent((std::shared_ptr<Sprite>)enemy_sprite);
-    // Criando o som do inimigo
-    Sound* enemy_sound = new Sound(*enemy, ENEMY_SOUND_PATH);
-    enemy->AddComponent((std::shared_ptr<Sound>)enemy_sound);
-    // Criando a interface do inimigo
-    Face* enemy_interface = new Face(*enemy);
-    enemy->AddComponent((std::shared_ptr<Face>)enemy_interface);
+    std::shared_ptr<GameObject> go = std::shared_ptr<GameObject>(new GameObject());
 
-    enemy->box.x = mouseX - (enemy_sprite->GetWidth()) / 2;
-    enemy->box.y = mouseY - (enemy_sprite->GetHeight()) / 2;
+    Sprite* sp = new Sprite(*go, ENEMY_SPRITE_PATH);
+    go->box.x = mouseX - sp->GetWidth() / 2 + Camera::pos.x;
+    go->box.y = mouseY - sp->GetHeight() / 2 + Camera::pos.y;
+    go->AddComponent(sp);
 
-    // Adicionando o inimigo no objectArray
-    objectArray.emplace_back(enemy);
+    Sound* sd = new Sound(*go, ENEMY_SOUND_PATH);
+    go->AddComponent(sd);
+
+    Face* fc = new Face(*go);
+    go->AddComponent(fc);
+
+    objectArray.emplace_back(std::move(go));
 }

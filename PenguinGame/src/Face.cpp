@@ -1,4 +1,7 @@
 #include "../include/Face.h"
+#include "../include/Sound.h"
+#include "../include/InputManager.h"
+#include "../include/Camera.h"
 
 Face::Face(GameObject& associated) : Component(associated) {
 	/*
@@ -19,7 +22,16 @@ e dê play no componente Sound de seu associated, se houver um.
 		associated.RequestDelete();
 
 }
-void Face::Update(float dt) {}
+void Face::Update(float dt) {
+	InputManager& input = InputManager::GetInstance();
+
+	if (input.MousePress(LEFT_MOUSE_BUTTON)) {
+		if (associated.box.Contains(input.GetMouseX() + Camera::pos.x, input.GetMouseY() + Camera::pos.y)) {
+			cout << "Damage applied.";
+			Damage(std::rand() % 10 + 10);
+		}
+	}
+}
 
 void Face::Render() {}
 

@@ -16,9 +16,7 @@ public:
     void Load(string file);
 
     void SetTileSet(TileSet* tileSet);
-
-    int& At(int x, int y, int z = 0);
-
+    int& At(int x, int y, int z);
     void Render() override;
 
     void Update(float dt) override;
@@ -33,11 +31,15 @@ public:
 
     int GetDepth();
 
+    void SetParallax(float);
+
 private:
     vector<int> tileMatrix;
     TileSet* tileSet;
     int mapWidth;
     int mapHeight;
     int mapDepth;
+    float parallax;
+
 };
 #endif
