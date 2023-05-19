@@ -36,12 +36,15 @@ gomp->box.x = 0;
 gomp->box.y = 0;
 TileSet* tlst = new TileSet(*gomp, 64, 64, "assets/img/tileset.png");
 TileMap* tlmp = new TileMap(*gomp, "assets/map/tileMap.txt", tlst);
+tlmp->SetParallax(1);
 gomp->AddComponent(tlmp);
+
+
 objectArray.emplace_back(std::move(gomp));
 
 // BGM
 music.Open(BACKGROUND_MUSIC_PATH);
-music.Play(-1);
+music.Play(BACKGROUND_MUSIC_LOOP_TIMES);
 }
 
 State::~State()
