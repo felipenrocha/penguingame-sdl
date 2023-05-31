@@ -1,6 +1,6 @@
 #include "../include/TileMap.h"
 #include "../include/Camera.h"
-#define PARALLAX_FACTOR .5
+#define PARALLAX_FACTOR .25
 void TileMap::Start() {
 
 }

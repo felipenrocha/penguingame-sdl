@@ -19,28 +19,29 @@
 
 State::State() {
     started = false;
-    auto bgGO(new GameObject);
-    bgGO->AddComponent(new CameraFollower(*bgGO));
-    bgGO->AddComponent(new Sprite(*bgGO, "assets/img/ocean.jpg"));
-
-    objectArray.emplace_back(bgGO);
-
-    auto mapGO(new GameObject);
-    mapGO->box.w = 1024;
-    mapGO->box.h = 600;
-
-    TileSet* tileSet = new TileSet(64, 64, "assets/img/tileset.png");
-    TileMap* tileMap = new TileMap(*mapGO, "assets/map/tileMap.txt", tileSet);
-    mapGO->AddComponent(tileMap);
-    objectArray.emplace_back(mapGO);
-
-    auto alienGO(new GameObject);
-    Rect& alienBox = alienGO->box;
-    alienBox += {512 + alienBox.w / 2, 300 + alienBox.h / 2};
-    alienGO->AddComponent(new Alien(*alienGO, 5));
-    objectArray.emplace_back(alienGO);
-
     quitRequested = false;
+
+    auto bg(new GameObject);
+    bg->AddComponent(new CameraFollower(*bg));
+    bg->AddComponent(new Sprite(*bg, "assets/img/ocean.jpg"));
+
+    objectArray.emplace_back(bg);
+
+    auto map(new GameObject);
+    map->box.w = 1024;
+    map->box.h = 600;
+
+    TileSet* tileSet = new TileSet(TILE_WIDTH, TILE_HEIGHT, "assets/img/tileset.png");
+    TileMap* tileMap = new TileMap(*map, "assets/map/tileMap.txt", tileSet);
+    map->AddComponent(tileMap);
+    objectArray.emplace_back(map);
+
+    auto alien(new GameObject);
+    Rect& alienBox = alien->box;
+    alienBox += {512 + alienBox.w / 2, 300 + alienBox.h / 2};
+    alien->AddComponent(new Alien(*alien, 5));
+    objectArray.emplace_back(alien);
+
 }
 
 State::~State() {

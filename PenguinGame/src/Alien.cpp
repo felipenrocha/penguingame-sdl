@@ -22,9 +22,8 @@ Alien::~Alien() {
 void Alien::Start() {
     auto minionSize = (float)minionArray.size();
     for (int i = 0; i < minionSize; i++) {
-        auto* minionGO = new GameObject;
+        GameObject* minionGO = new GameObject;
 
-        //espaca os minions igualmente na orbita em funcao da quantidade
         auto setor = (float)(2 * M_PI * (i / minionSize));
 
         minionGO->AddComponent(new Minion(*minionGO,
@@ -55,11 +54,12 @@ void Alien::Update(float dt) {
         auto action = taskQueue.front();
 
         if (action.type == Action::MOVE) {
+            // get speed based on alienspeed
             Vec2 deltaX = { ALIEN_SPEED * dt, 0 };
+            //vec
             Vec2 calculado = action.pos - Vec2(associated.box.x + (associated.box.w / 2), associated.box.y + (associated.box.h / 2));
             Vec2 real = deltaX.Rotate(calculado.InclX());
-
-            //Distancia minima para o Alien nao chegar ao destino no proximo frame
+            
             if (calculado.Mag() < real.Mag()) {
                 associated.box += calculado;
                 taskQueue.pop();
