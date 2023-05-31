@@ -1,107 +1,75 @@
 #include "../include/TileMap.h"
 #include "../include/Camera.h"
+#define PARALLAX_FACTOR .5
 void TileMap::Start() {
 
 }
-TileMap::TileMap(GameObject& associated, string file, TileSet* tileSet) : Component(associated)
-{
-    this->parallax = 0;
+TileMap::TileMap(GameObject& associated, string file, TileSet* tileSet) : Component(associated) {
+    Load(move(file));
     SetTileSet(tileSet);
-    Load(file);
 }
 
-void TileMap::SetTileSet(TileSet *tileSet)
-{
-    //set tilemap
+void TileMap::Load(string file) {
+    FILE* fp = fopen((file).c_str(), "r");
+    if (fp == nullptr) {
+        cout << "Unable to load TileMap: " << file << endl;
+        exit(1);
+    }
+
+    if (fscanf(fp, "%d,%d,%d", &mapWidth, &mapHeight, &mapDepth) != 3) {
+        cout << "Error in TileMap dimentions: " << file << endl;
+        exit(1);
+    }
+
+    int scanned;
+    fseek(fp, 1, SEEK_CUR);
+    while (!feof(fp)) {
+        fscanf(fp, " %d,", &scanned);
+        tileMatrix.push_back(scanned - 1);
+    }
+
+    fclose(fp);
+}
+
+void TileMap::SetTileSet(TileSet* tileSet) {
     this->tileSet = tileSet;
 }
-void TileMap::Load(std::string file)
-{
-    // load file
-    ifstream arquivo;
-    int tile;
-    arquivo.open(file.c_str());
-    if (arquivo) // garante q o arquivo foi aberto corretamente.
-    {
-        // get three first values and passing to mapWidth, mapHeight and mapDepth, using a comma as separator
-        char virgula;
-        arquivo >> mapWidth >> virgula >> mapHeight >> virgula >> mapDepth;
 
-        // imprime os valores
-        cout << "mapWidth: " << mapWidth << endl;
-        cout << "mapHeight: " << mapHeight << endl;
-        cout << "mapDepth: " << mapDepth << endl;
-
-        // push all tiles to vector
-
-        for (int i = 0; i < (mapWidth * mapHeight * mapDepth); i++)
-        {
-            arquivo >> tile >> virgula;
-            // std::cout << i << ": " << tile << std::endl;
-            tileMatrix.push_back(tile - 1);
-        }
-
-        arquivo.close(); // fecha o arquivo
-    }
-}
-
-void TileMap::Render()
-{
-    // Renderiza as camadas do mapa. Dica: utilize o RenderLayer e o box do
-    //  GameObject que o cont�m.
-    for (int i = 0;i < mapDepth; i++)
-    {
-        RenderLayer(i, Camera::pos.x + (int)Camera::pos.x * parallax * i, Camera::pos.y + (int)Camera::pos.y * parallax * i);
-
-    }
+int& TileMap::At(int x, int y, int z) {
+    return tileMatrix[x + (y * mapWidth) + (z * mapWidth * mapHeight)];
 }
 
 void TileMap::RenderLayer(int layer, int cameraX, int cameraY) {
-    for (int x = 0; x < mapWidth; x++)
-    {
-        for (int y = 0; y < mapHeight; y++)
-        {
-            tileSet->RenderTile(At(x, y, layer),
-                (float)(x * tileSet->GetTileWidth()),
-                (float)(y * tileSet->GetTileHeight()));
+    for (int i = 0; i < mapWidth; i++) {
+        for (int j = 0; j < mapHeight; j++) {
+            auto x = (int)(i * tileSet->GetTileWidth() - cameraX - PARALLAX_FACTOR * Camera::pos.x * layer);
+            auto y = (int)(j * tileSet->GetTileHeight() - cameraY - PARALLAX_FACTOR * Camera::pos.y * layer);
+
+            tileSet->RenderTile((unsigned)At(i, j, layer), x, y);
         }
     }
 }
-void TileMap::Update(float dt)
-{
+
+void TileMap::Render() {
+    for (int z = 0; z < mapDepth; ++z) {
+        RenderLayer(z, (int)(Camera::pos.x), (int)(Camera::pos.y));
+    }
 }
 
-bool TileMap::Is(string type)
-{
-    if (type == "TileMap")
-        return true;
-    return false;
+void TileMap::Update(float dt) {}
+
+bool TileMap::Is(string type) {
+    return type == "TileMap";
 }
 
-int TileMap::GetWidth()
-{
+int TileMap::GetWidth() {
     return this->mapWidth;
 }
 
-int TileMap::GetHeight()
-{
+int TileMap::GetHeight() {
     return this->mapHeight;
 }
 
-int TileMap::GetDepth()
-{
+int TileMap::GetDepth() {
     return this->mapDepth;
-}
-/*At é um método acessor. Ele retorna uma referência ao elemento
-[x][y][z] de tileMatrix. */
-int& TileMap::At(int x, int y, int z)
-{   
-    // indice = x + largura*y + (z*largura*altura) 
-    int index = x + (y * mapWidth) + (z * mapWidth * mapHeight);
-    int& reference = tileMatrix[index];
-
-    return reference;
-}
-void TileMap::SetParallax(float parallax) {
-    this->parallax = parallax;
 }

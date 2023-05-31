@@ -2,10 +2,10 @@
 
 #ifndef __TILE_MAP_H__
 #define __TILE_MAP_H__
-
+#define _CRT_SECURE_NO_WARNINGS
 using namespace std;
 #include <fstream> //using to manip files
-
+#include <stdio.h>
 #include "GameObject.h"
 #include "TileSet.h"
 
