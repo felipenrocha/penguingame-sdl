@@ -12,10 +12,10 @@ using namespace std;
 class TileSet
 {
 public:
-	TileSet(GameObject& associated, int tileWidth, int tileHeight, string file);
+	TileSet(int tileWidth, int tileHeight, string file);
 	void RenderTile(unsigned index, float x, float y);
-    int GetTileWidth();
-    int GetTileHeight();
+    int GetTileWidth() const;
+    int GetTileHeight() const;
 private:
     Sprite tileSet;
     int rows;

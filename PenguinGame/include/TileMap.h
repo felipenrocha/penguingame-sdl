@@ -12,6 +12,7 @@ using namespace std;
 class TileMap : public Component {
 public:
     TileMap(GameObject& associated, string file, TileSet* tileSet);
+    void Start() override;
 
     void Load(string file);
 

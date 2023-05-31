@@ -1,5 +1,5 @@
 #include "../include/InputManager.h"
-
+#include "../include/Camera.h"
 InputManager::InputManager() :
     mouseState{ false, false, false, false, false, false },
     mouseUpdate{ 0, 0, 0, 0, 0, 0 },
@@ -13,7 +13,9 @@ InputManager::InputManager() :
 InputManager::~InputManager()
 {
 }
-
+Vec2 InputManager::GetMouse() {
+    return { mouseX + Camera::pos.x, mouseY + Camera::pos.y };
+}
 void InputManager::Update()
 {
     SDL_Event event;

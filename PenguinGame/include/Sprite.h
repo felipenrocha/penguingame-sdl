@@ -19,13 +19,15 @@ public:
     explicit Sprite(GameObject& associated);
     explicit Sprite(GameObject& associated, string file);
     ~Sprite() override;
+    void Start() override;
 
     void Open(string file);
     void SetClip(int x, int y, int w, int h);
     int GetWidth();
     int GetHeight();
     bool IsOpen();
-
+    void SetScale(float scaleX, float scaleY);
+    Vec2 GetScale();
     void Update(float dt) override;
     void Render() override;
     void Render(float x, float y);
@@ -37,7 +39,7 @@ private:
     int width;
     int height;
     SDL_Rect clipRect;
-
+    Vec2 scale;
 };
 
 

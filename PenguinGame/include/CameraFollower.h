@@ -14,6 +14,7 @@ public:
     CameraFollower(GameObject& associated);
     void Update(float dt);
     void Render();
+    void Start() override;
     bool Is(std::string type);
 };
 

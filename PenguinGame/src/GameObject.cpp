@@ -1,50 +1,43 @@
 #include <algorithm>
 #include "../include/GameObject.h"
+GameObject::GameObject() : isDead(false), started(false), angleDeg(0) {}
 
-GameObject::GameObject() : box(0, 0, 0, 0),
-isDead(false)
-{
-}
-
-GameObject::~GameObject()
-{
-
+GameObject::~GameObject() {
+    for (auto it = components.rbegin(); it != components.rend(); ++it) {
+        (*it).reset();
+    }
     components.clear();
 }
 
-void GameObject::Update(float dt)
-{
-    for (int i = components.size() - 1; i >= 0; --i)
-    {
-        components[i]->Update(dt);
+void GameObject::Update(float dt) {
+    for (auto& component : components) {
+        component->Update(dt);
     }
 }
 
-void GameObject::Render()
-{
-    for (int i = components.size() - 1; i >= 0; --i)
-    {
-        components[i]->Render();
+void GameObject::Render() {
+    for (auto& component : components) {
+        component->Render();
     }
 }
 
-bool GameObject::IsDead()
-{
+bool GameObject::IsDead() {
     return isDead;
 }
 
-void GameObject::RequestDelete()
-{
+void GameObject::RequestDelete() {
     isDead = true;
 }
 
-
 void GameObject::AddComponent(Component* cpt) {
     components.emplace_back(cpt);
+    if (started) {
+        cpt->Start();
+    }
 }
 
 void GameObject::RemoveComponent(Component* cpt) {
-    for (unsigned int i = 0; i < components.size(); i++) {
+    for (int i = 0; i < components.size(); ++i) {
         if (components[i].get() == cpt) {
             components.erase(components.begin() + i);
             break;
@@ -52,14 +45,18 @@ void GameObject::RemoveComponent(Component* cpt) {
     }
 }
 
-std::shared_ptr<Component> GameObject::GetComponent(std::string type)
-{
-    for (int i = components.size() - 1; i >= 0; i--)
-    {
-        if (components[i]->Is(type))
-        {
-            return components[i];
+Component* GameObject::GetComponent(string type) {
+    for (auto& component : components) {
+        if (component->Is(type)) {
+            return component.get();
         }
     }
     return nullptr;
+}
+
+void GameObject::Start() {
+    for (auto& component : components) {
+        component->Start();
+    }
+    started = true;
 }

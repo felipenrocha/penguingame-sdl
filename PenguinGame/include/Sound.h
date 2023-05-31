@@ -11,6 +11,7 @@ public:
     explicit Sound(GameObject& associated);
     Sound(GameObject& associated, string file);
     ~Sound() override;
+    void Start() override;
 
     void Play(int times = 1);
     void Stop(int msToStop = 1500);

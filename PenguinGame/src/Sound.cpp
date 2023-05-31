@@ -64,3 +64,4 @@ bool Sound::Is(string type) {
     return type == "Sound";
 }
 
+void Sound::Start(){}

@@ -1,6 +1,8 @@
 #include "../include/TileMap.h"
 #include "../include/Camera.h"
+void TileMap::Start() {
 
+}
 TileMap::TileMap(GameObject& associated, string file, TileSet* tileSet) : Component(associated)
 {
     this->parallax = 0;

@@ -1,85 +1,68 @@
 #include "../include/Resources.h"
 
 
-std::unordered_map<std::string, SDL_Texture*> Resources::imageTable;
-std::unordered_map<std::string, Mix_Music*> Resources::musicTable;
-std::unordered_map<std::string, Mix_Chunk*> Resources::soundTable;
+unordered_map<string, SDL_Texture*> Resources::imageTable;
+unordered_map<string, Mix_Music*> Resources::musicTable;
+unordered_map<string, Mix_Chunk*> Resources::soundTable;
 
-SDL_Texture* Resources::GetImage(const std::string& file) {
-    // verifica se a imagem já foi carregada
-    auto it = imageTable.find(file);
-    if (it != imageTable.end()) {
-        return it->second; // retorna a imagem já carregada
+SDL_Texture* Resources::GetImage(string file) {
+    if (imageTable.find(file) == imageTable.end()) {
+        auto texture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), (file).c_str());
+        if (texture == nullptr) {
+            cout << "Unable to load texture: " << SDL_GetError() << endl;
+            exit(1);
+        }
+        imageTable.insert(make_pair(file, texture));
+        return texture;
     }
-    // caso de imagem nao carregada:
-    cout << "Imagem não encontrada, carregando arquivo.";
-    // carrega a imagem
-    SDL_Texture* texture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), file.c_str());
-   // armazena a imagem no mapa
-    imageTable.insert({ file, texture });
-    return texture;
-   
-
-
+    return (*imageTable.find(file)).second;
 }
 
 void Resources::ClearImages() {
-    // libera a memória alocada para as imagens
-    for (auto& pair : imageTable) {
-        SDL_DestroyTexture(pair.second);
+    for (auto& iT : imageTable) {
+        SDL_DestroyTexture(iT.second);
     }
     imageTable.clear();
 }
 
-Mix_Music* Resources::GetMusic(const std::string& file) {
-    // verifica se a música já foi carregada
-    auto it = musicTable.find(file);
-    if (it != musicTable.end()) {
-        return it->second; // retorna a música já carregada
+Mix_Music* Resources::GetMusic(string file) {
+    if (musicTable.find(file) == musicTable.end()) {
+        auto music = Mix_LoadMUS((file).c_str());
+        if (music == nullptr) {
+            cout << "Unable to load music: " << SDL_GetError() << endl;
+            exit(1);
+        }
+        musicTable.insert(make_pair(file, music));
+        return music;
     }
-    //caso da musica nao carregada
-    cout << "Música não encontrada, carregando arquivo.";
-    // 
-    // carrega a música
-    Mix_Music* music = Mix_LoadMUS(file.c_str());
-
-    // armazena a música no mapa
-    musicTable.insert({ file , music });
-
-    return music;
+    return (*musicTable.find(file)).second;
 }
 
 void Resources::ClearMusics() {
-    // libera a memória alocada para as músicas
-    for (auto& pair : musicTable) {
-        Mix_FreeMusic(pair.second);
+    for (auto& mT : musicTable) {
+        Mix_FreeMusic(mT.second);
     }
     musicTable.clear();
 }
 
-Mix_Chunk* Resources::GetSound(const std::string& file) {
-    // verifica se o som já foi carregado
-    auto it = soundTable.find(file);
-    if (it != soundTable.end()) {
-        return it->second; // retorna o som já carregado
+Mix_Chunk* Resources::GetSound(string file) {
+    if (soundTable.find(file) == soundTable.end()) {
+        auto chunk = Mix_LoadWAV((file).c_str());
+        if (chunk == nullptr) {
+            cout << "Unable to load sound: " << SDL_GetError() << endl;
+            exit(1);
+        }
+        soundTable.insert(make_pair(file, chunk));
+        return chunk;
     }
-    //caso do som nao encontrado
-    cout << "Imagem não encontrada, carregando arquivo.";
-
-    // carrega o som
-
-    Mix_Chunk* chunk = Mix_LoadWAV(file.c_str());
-
-    // armazena o som no mapa
-    soundTable.insert({ file, chunk });
-
-    return chunk;
+    return (*soundTable.find(file)).second;
 }
 
 void Resources::ClearSounds() {
-    // libera a memória alocada para os sons
-    for (auto& pair : soundTable) {
-        Mix_FreeChunk(pair.second);
+    for (auto& sT : soundTable) {
+        Mix_FreeChunk(sT.second);
     }
     soundTable.clear();
 }
+
+

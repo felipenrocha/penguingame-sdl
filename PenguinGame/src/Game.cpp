@@ -89,6 +89,7 @@ Game::~Game() {
 }
 
 void Game::Run() {
+    GetState().Start();
     while (!GetState().QuitRequested()) {
         // first calculate delta time
         CalculateDeltaTime();

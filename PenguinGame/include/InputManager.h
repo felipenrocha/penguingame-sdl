@@ -1,7 +1,7 @@
 #ifndef __INPUTMANAGER_H__
 #define __INPUTMANAGER_H__
 #include <unordered_map>
-
+#include "../include/Vec2.h"
 #include <SDL.h>
 #define LEFT_ARROW_KEY SDLK_LEFT
 #define RIGHT_ARROW_KEY SDLK_RIGHT
@@ -9,6 +9,8 @@
 #define DOWN_ARROW_KEY SDLK_DOWN
 #define ESCAPE_KEY SDLK_ESCAPE
 #define LEFT_MOUSE_BUTTON SDL_BUTTON_LEFT
+#define RIGHT_MOUSE_BUTTON  SDL_BUTTON_RIGHT
+
 #define SPACEBAR_KEY 32
 
 using namespace std;
@@ -24,12 +26,14 @@ public:
     bool IsMouseDown(int button);
     int GetMouseX();
     int GetMouseY();
+    Vec2 GetMouse();
+
     bool QuitRequested();
     static InputManager& GetInstance();
-
-private:
     InputManager();
     ~InputManager();
+private:
+
 
     bool mouseState[6];
     int mouseUpdate[6];

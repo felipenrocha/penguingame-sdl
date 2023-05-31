@@ -1,38 +1,28 @@
 #include "../include/Sprite.h"
 #include "../include/Game.h"
-//
-// Created by edgar on 16/03/18.
-//
 
-#define INCLUDE_SDL_IMAGE
+#include "../include/Resources.h"
+#include "../include/Camera.h"
 
-Sprite::Sprite(GameObject& associated) : Component(associated) {
-    texture = nullptr;
+
+
+Sprite::Sprite(GameObject& associated) : Component(associated), texture(nullptr), scale(1, 1) { }
+
+Sprite::Sprite(GameObject& associated, string file) : Component(associated), texture(nullptr), scale(1, 1) {
+    Open(move(file));
 }
-
-Sprite::Sprite(GameObject& associated, string file) : Component(associated) {
-    texture = nullptr;
-    Open(file);
+void Sprite::Start() {
+    
 }
-
 Sprite::~Sprite() {
-    if (texture != nullptr)
-        SDL_DestroyTexture(texture);
 }
 
 void Sprite::Open(string file) {
-    if (IsOpen())
-        SDL_DestroyTexture(texture);
-
-    texture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), (file).c_str());
-    if (texture == nullptr) {
-        cout << "Unable to load texture: " << SDL_GetError() << endl;
-        exit(1);
-    }
+    texture = Resources::GetImage(move(file));
 
     SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
-    associated.box.h = (float) height;
-    associated.box.w = (float) width;
+    associated.box.w = width;
+    associated.box.h = height;
     SetClip(0, 0, width, height);
 }
 
@@ -42,20 +32,20 @@ void Sprite::SetClip(int x, int y, int w, int h) {
 }
 
 void Sprite::Render() {
-    Render((int)associated.box.x, (int)associated.box.y);
+    Render((int)associated.box.x - (int)Camera::pos.x, (int)associated.box.y - (int)Camera::pos.y);
 }
 
 void Sprite::Render(float x, float y) {
-    SDL_Rect dst = { (int)x, (int)y, clipRect.w, clipRect.h };
-    SDL_RenderCopy(Game::GetInstance().GetRenderer(), texture, &clipRect, &dst);
+    SDL_Rect dst = { (int)x, (int)y, (int)(clipRect.w * scale.x), (int)(clipRect.h * scale.x) };
+    SDL_RenderCopyEx(Game::GetInstance().GetRenderer(), texture, &clipRect, &dst, associated.angleDeg, nullptr, SDL_FLIP_NONE);
 }
 
 int Sprite::GetWidth() {
-    return width;
+    return (int)(width * scale.x);
 }
 
 int Sprite::GetHeight() {
-    return height;
+    return (int)(height * scale.y);
 }
 
 bool Sprite::IsOpen() {
@@ -66,5 +56,24 @@ void Sprite::Update(float dt) {}
 
 bool Sprite::Is(string type) {
     return type == "Sprite";
+}
+
+void Sprite::SetScale(float scaleX, float scaleY) {
+    auto& box = associated.box;
+    if (scaleX != 0) {
+        scale.x = scaleX;
+        box.w = width * scaleX;
+        box.x = box.CenterCoord().x - box.w / 2;
+    }
+
+    if (scaleY != 0) {
+        scale.y = scaleY;
+        box.h = height * scaleY;
+        box.y = box.CenterCoord().y - box.h / 2;
+    }
+}
+
+Vec2 Sprite::GetScale() {
+    return scale;
 }
 

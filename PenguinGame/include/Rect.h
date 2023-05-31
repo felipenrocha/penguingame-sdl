@@ -5,13 +5,21 @@
 
 #include "Vec2.h"
 class Rect
-{	public:
-		float x, y, w, h;
-	Rect(float _x, float _y, float _w, float _h) : x(_x), y(_y), w(_w), h(_h) {}
-	Rect();
-	bool Contains(float x, float y);
+{
+public:
+    float x, y, w, h;
 
-	~Rect() {}
+    Rect();
+    Rect(float x, float y, float w, float h);
+
+    Rect SumVec2(Vec2 v);
+    Rect SubVec2(Vec2 v);
+    Vec2 CenterCoord();
+    float DistRecs(Rect r);
+    float DistVec2(Vec2 v);
+    bool Contains(Vec2 v);
+
+    Rect operator+=(Vec2 v);
 
 };
 

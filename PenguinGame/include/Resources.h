@@ -8,13 +8,13 @@
 
 class Resources {
 public:
-    static SDL_Texture* GetImage(const std::string& file);
+    static SDL_Texture* GetImage(string file);
     static void ClearImages();
 
-    static Mix_Music* GetMusic(const std::string& file);
+    static Mix_Music* GetMusic(string file);
     static void ClearMusics();
 
-    static Mix_Chunk* GetSound(const std::string& file);
+    static Mix_Chunk* GetSound(string file);
     static void ClearSounds();
 
 private:
